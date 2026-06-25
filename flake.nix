@@ -50,11 +50,17 @@
 
       checks = forAllSystems (system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
-          rtl  = "src/rtl";
+          pkgs  = nixpkgs.legacyPackages.${system};
+          pkgs' = self.packages.${system};
+          rtl   = "src/rtl";
+
+          mkSimCheck = name: pkg: pkgs.runCommand "sim-${name}" {} ''
+            ${pkg}/bin/${name}.sim | tee /dev/stderr
+            touch $out
+          '';
         in
         {
-          lint = pkgs.stdenv.mkDerivation {
+          lint     = pkgs.stdenv.mkDerivation {
             name = "aes-lint";
             src  = self;
             nativeBuildInputs = [ pkgs.verilator ];
@@ -66,6 +72,12 @@
             '';
             installPhase = "touch $out";
           };
+
+          sim-top      = mkSimCheck "top"      pkgs'.top;
+          sim-core     = mkSimCheck "core"     pkgs'.core;
+          sim-keymem   = mkSimCheck "keymem"   pkgs'.keymem;
+          sim-encipher = mkSimCheck "encipher"  pkgs'.encipher;
+          sim-decipher = mkSimCheck "decipher"  pkgs'.decipher;
         });
     };
 }
