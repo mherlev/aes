@@ -47,5 +47,25 @@
 
           default  = mkSim "top.sim"      "${tb}/tb_aes.v ${rtl}/aes.v ${rtl}/aes_core.v ${rtl}/aes_key_mem.v ${rtl}/aes_sbox.v ${rtl}/aes_inv_sbox.v ${rtl}/aes_encipher_block.v ${rtl}/aes_decipher_block.v";
         });
+
+      checks = forAllSystems (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          rtl  = "src/rtl";
+        in
+        {
+          lint = pkgs.stdenv.mkDerivation {
+            name = "aes-lint";
+            src  = self;
+            nativeBuildInputs = [ pkgs.verilator ];
+            buildPhase = ''
+              verilator +1364-2001ext+ --lint-only -Wall -Wno-fatal -Wno-DECLFILENAME \
+                ${rtl}/aes.v ${rtl}/aes_core.v ${rtl}/aes_key_mem.v \
+                ${rtl}/aes_sbox.v ${rtl}/aes_inv_sbox.v \
+                ${rtl}/aes_encipher_block.v ${rtl}/aes_decipher_block.v
+            '';
+            installPhase = "touch $out";
+          };
+        });
     };
 }
