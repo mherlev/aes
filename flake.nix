@@ -1,7 +1,7 @@
 {
   description = "Verilog implementation of AES (NIST FIPS 197)";
 
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
 
   outputs = { self, nixpkgs }:
     let
