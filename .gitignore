@@ -8,6 +8,11 @@
 ## Generated files
 test*
 *.sim
+*.vcd
+
+## Nix build outputs
+result
+result-*
 
 ## Log files
 *.log
